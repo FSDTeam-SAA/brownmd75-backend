@@ -80,11 +80,16 @@ const updateCategory = async (
   return result;
 };
 
+const deleteCategory = async (id: string) => {
+  throw new Error("This api completed later");
+};
+
 const categoryService = {
   createCategory,
   getAllCategories,
   getSingleCategory,
   updateCategory,
+  deleteCategory,
 };
 
 export default categoryService;
