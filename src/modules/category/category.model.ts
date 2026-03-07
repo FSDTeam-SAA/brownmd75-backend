@@ -8,8 +8,8 @@ const categoryModel = new Schema<ICategory>(
       required: true,
     },
     image: {
-      type: String,
-      required: true,
+      public_id: String,
+      url: String,
     },
   },
   { timestamps: true, versionKey: false },
