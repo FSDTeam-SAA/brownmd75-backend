@@ -16,8 +16,31 @@ const createCategory = async (payload: ICategory, file: any) => {
   return result;
 };
 
+const getAllCategories = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit;
+
+  const data = await Category.find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const total = await Category.countDocuments();
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+    data,
+    note: "there some thing add in future when product is added each category total product will be added",
+  };
+};
+
 const categoryService = {
   createCategory,
+  getAllCategories,
 };
 
 export default categoryService;
