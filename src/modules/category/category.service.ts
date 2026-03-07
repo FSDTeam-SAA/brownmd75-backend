@@ -1,4 +1,7 @@
-import { uploadToCloudinary } from "../../utils/cloudinary";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "../../utils/cloudinary";
 import { ICategory } from "./category.interface";
 import { Category } from "./category.model";
 
@@ -43,10 +46,45 @@ const getSingleCategory = async (id: string) => {
   return result;
 };
 
+const updateCategory = async (
+  id: string,
+  payload: Partial<ICategory>,
+  file?: any,
+) => {
+  const isCategoryExist = await Category.findById(id);
+
+  if (!isCategoryExist) {
+    throw new Error("Category not found");
+  }
+
+  if (file) {
+    // Upload new image
+    const uploadResult = await uploadToCloudinary(file.path, "categories");
+
+    payload.image = {
+      public_id: uploadResult.public_id,
+      url: uploadResult.secure_url,
+    };
+
+    // Delete old image
+    if (isCategoryExist.image?.public_id) {
+      await deleteFromCloudinary(isCategoryExist.image.public_id);
+    }
+  }
+
+  const result = await Category.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+
+  return result;
+};
+
 const categoryService = {
   createCategory,
   getAllCategories,
   getSingleCategory,
+  updateCategory,
 };
 
 export default categoryService;
