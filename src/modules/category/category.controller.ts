@@ -15,8 +15,39 @@ const createCategory = catchAsync(async (req, res) => {
   });
 });
 
+const getAllCategories = catchAsync(async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+
+  const result = await categoryService.getAllCategories(
+    Number(page),
+    Number(limit),
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Categories retrieved successfully.",
+    data: result.data,
+    meta: result.meta,
+  });
+});
+
+const getSingleCategory = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await categoryService.getSingleCategory(id);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Category retrieved successfully.",
+    data: result,
+  });
+});
+
 const categoryController = {
   createCategory,
+  getAllCategories,
+  getSingleCategory,
 };
 
 export default categoryController;
