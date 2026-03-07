@@ -1,41 +1,74 @@
-import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
+// src/utils/cloudinary.ts
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+import fs from "fs/promises";
 import config from "../config";
 import logger from "../logger";
 
-// configure Cloudinary
+interface ICloudinaryResponse {
+  public_id: string;
+  secure_url: string;
+}
+
 cloudinary.config({
   cloud_name: config.cloudinary.cloud_name,
   api_key: config.cloudinary.api_key,
   api_secret: config.cloudinary.api_secret,
 });
 
-// upload file
-export const uploadToCloudinary = async (filePath: string, folder: string) => {
+const silentUnlink = async (path: string): Promise<void> => {
   try {
-    const result = await cloudinary.uploader.upload(filePath, {
+    await fs.unlink(path);
+  } catch (err) {
+    logger.warn(`Cleanup skipped: File ${path} not found or already removed.`);
+  }
+};
+
+export const deleteFromCloudinary = async (public_id: string): Promise<void> => {
+  try {
+    await cloudinary.uploader.destroy(public_id);
+    logger.info(`Deleted image with public_id: ${public_id} from Cloudinary`);
+  } catch (error: any) {
+    logger.error(
+      {
+        msg: error.message,
+        http_code: error.http_code,
+        name: error.name,
+      },
+      "Cloudinary Deletion Error"
+    );
+    throw new Error(`Cloudinary Deletion Failed: ${error.message || "Unknown Error"}`);
+  }
+};
+
+export const uploadToCloudinary = async (
+  filePath: string,
+  folder: string
+): Promise<ICloudinaryResponse> => {
+  try {
+    const result: UploadApiResponse = await cloudinary.uploader.upload(filePath, {
       folder,
       resource_type: "auto",
     });
 
-    // delete local file after upload
-    fs.unlinkSync(filePath);
+    await silentUnlink(filePath);
 
     return {
       public_id: result.public_id,
       secure_url: result.secure_url,
     };
   } catch (error: any) {
-    logger.error("Cloudinary upload error:", error);
-    throw new Error("Failed to upload file to Cloudinary");
-  }
-};
+    // FIX: Swapped arguments. Pino syntax: logger.error(object, message)
+    logger.error(
+      {
+        msg: error.message,
+        http_code: error.http_code,
+        name: error.name,
+      },
+      "Cloudinary SDK Error"
+    );
 
-// delete file
-export const deleteFromCloudinary = async (publicId: string) => {
-  try {
-    await cloudinary.uploader.destroy(publicId);
-  } catch (error) {
-    throw new Error("Failed to delete file from Cloudinary");
+    await silentUnlink(filePath);
+
+    throw new Error(`Cloudinary Upload Failed: ${error.message || "Unknown Error"}`);
   }
 };
