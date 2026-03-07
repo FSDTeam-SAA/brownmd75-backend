@@ -16,6 +16,7 @@ const createCategory = async (payload: ICategory, file: any) => {
   return result;
 };
 
+//! there some thing add in future when product is added each category total product will be added,
 const getAllCategories = async (page: number, limit: number) => {
   const skip = (page - 1) * limit;
 
@@ -34,13 +35,18 @@ const getAllCategories = async (page: number, limit: number) => {
       totalPage: Math.ceil(total / limit),
     },
     data,
-    note: "there some thing add in future when product is added each category total product will be added",
   };
+};
+
+const getSingleCategory = async (id: string) => {
+  const result = await Category.findById(id);
+  return result;
 };
 
 const categoryService = {
   createCategory,
   getAllCategories,
+  getSingleCategory,
 };
 
 export default categoryService;

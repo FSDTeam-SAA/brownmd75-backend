@@ -14,6 +14,7 @@ router.post(
 );
 
 router.get("/", categoryController.getAllCategories);
+router.get("/:id", categoryController.getSingleCategory);
 
 const categoryRouter = router;
 export default categoryRouter;
