@@ -1,4 +1,7 @@
 export interface ICategory {
   title: string;
-  image: string;
+  image: {
+    public_id: string;
+    url: string;
+  }
 }

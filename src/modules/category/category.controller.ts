@@ -4,7 +4,8 @@ import sendResponse from "../../utils/sendResponse";
 import categoryService from "./category.service";
 
 const createCategory = catchAsync(async (req, res) => {
-  const result = await categoryService.createCategory(req.body);
+  const file = req.file;
+  const result = await categoryService.createCategory(req.body, file);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -18,4 +19,4 @@ const categoryController = {
   createCategory,
 };
 
-export default categoryController
+export default categoryController;
