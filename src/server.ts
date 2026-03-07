@@ -5,6 +5,7 @@ import app from "./app";
 import config from "./config";
 import logger from "./logger";
 import { initNotificationSocket } from "./socket/notification.service";
+// import { upload } from "./middleware/multer.middleware";
 
 async function main() {
   try {
