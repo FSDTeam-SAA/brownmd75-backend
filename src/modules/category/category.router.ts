@@ -18,8 +18,13 @@ router.get("/:id", categoryController.getSingleCategory);
 router.put(
   "/update/:id",
   upload.single("image"),
-//   auth(USER_ROLE.ADMIN),
+  auth(USER_ROLE.ADMIN),
   categoryController.updateCategory,
+);
+router.delete(
+  "/delete/:id",
+//   auth(USER_ROLE.ADMIN),
+  categoryController.deleteCategory,
 );
 
 const categoryRouter = router;
