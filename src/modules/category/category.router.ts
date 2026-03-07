@@ -9,12 +9,18 @@ const router = Router();
 router.post(
   "/create",
   upload.single("image"),
-  auth(USER_ROLE.ADMIN),
+//   auth(USER_ROLE.ADMIN),
   categoryController.createCategory,
 );
 
 router.get("/", categoryController.getAllCategories);
 router.get("/:id", categoryController.getSingleCategory);
+router.put(
+  "/update/:id",
+  upload.single("image"),
+//   auth(USER_ROLE.ADMIN),
+  categoryController.updateCategory,
+);
 
 const categoryRouter = router;
 export default categoryRouter;
