@@ -26,7 +26,7 @@ const login = async (payload: { email: string; password: string }) => {
     throw new AppError("Invalid password", StatusCodes.UNAUTHORIZED);
 
   const tokenPayload = {
-    id: user._id,
+    _id: user._id,
     email: user.email,
     role: user.role,
   };
