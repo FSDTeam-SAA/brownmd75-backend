@@ -1,4 +1,4 @@
-// src/modules/order/order.service.ts
+﻿// src/modules/order/order.service.ts
 
 import mongoose, { Types } from 'mongoose';
 import { StatusCodes } from 'http-status-codes';
@@ -33,11 +33,6 @@ const createOrderIntoDB = async (userId: string, payload: Partial<IOrder>) => {
         // 2. Prepare Order Items (Snapshotting)
         const orderItems = cart.items.map((item) => {
             const equipment = item.equipment as unknown as IEquipment;
-        // We explicitly type the map return to match the IOrder['items'] definition
-        const orderItems = cart.items.map((item) => {
-            const equipment = item.equipment as unknown as IEquipment;
-
-            // Map rentalType to the actual price field in Equipment
             const priceAtBooking = (equipment as any)[item.rentalType];
 
             if (priceAtBooking === undefined) {
@@ -46,7 +41,6 @@ const createOrderIntoDB = async (userId: string, payload: Partial<IOrder>) => {
 
             return {
                 equipment: new Types.ObjectId(equipment._id),
-                equipment: new Types.ObjectId(equipment._id), // Explicitly cast to ObjectId
                 title: equipment.title,
                 priceAtBooking: Number(priceAtBooking),
                 rentalType: item.rentalType as string,
@@ -56,8 +50,6 @@ const createOrderIntoDB = async (userId: string, payload: Partial<IOrder>) => {
 
         // 3. Prepare Order Object
         const orderData: any = {
-        // 3. Construct the Order data
-        const orderData = {
             user: new Types.ObjectId(userId),
             items: orderItems,
             totalAmount: cart.totalPrice,
@@ -83,16 +75,6 @@ const createOrderIntoDB = async (userId: string, payload: Partial<IOrder>) => {
         // 6. Post-order logic
         if (payload.paymentMethod === 'cod') {
             // For COD, clear cart immediately
-            paymentStatus: 'pending' as const,
-            orderStatus: 'pending' as const,
-        };
-
-        // 4. Create the Order
-        // Using [orderData] because .create with a session expects an array
-        const [newOrder] = await Order.create([orderData], { session });
-
-        // 5. Atomic Cart Cleanup (For COD)
-        if (payload.paymentMethod === 'cod') {
             await Cart.findOneAndUpdate(
                 { user: userId },
                 { items: [], totalPrice: 0 },
@@ -109,9 +91,6 @@ const createOrderIntoDB = async (userId: string, payload: Partial<IOrder>) => {
             order: newOrder,
             clientSecret,
         };
-
-        await session.commitTransaction();
-        return newOrder;
     } catch (error: any) {
         await session.abortTransaction();
         throw new AppError(error.message, error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR);
@@ -127,9 +106,6 @@ const getMyOrdersFromDB = async (userId: string) => {
     return await Order.find({ user: userId })
         .populate('items.equipment')
         .sort('-createdAt'); // Latest orders first
-  return await Order.find({ user: userId })
-    .populate('items.equipment')
-    .sort('-createdAt'); // Latest orders first
 };
 
 /**
@@ -140,10 +116,6 @@ const getAllOrdersFromDB = async () => {
         .populate('user', 'name email phone') // Only get necessary user details
         .populate('items.equipment')
         .sort('-createdAt');
-  return await Order.find()
-    .populate('user', 'name email phone') // Only get necessary user details
-    .populate('items.equipment')
-    .sort('-createdAt');
 };
 
 /**
@@ -316,18 +288,6 @@ const requestRefundFromDB = async (orderId: string, userId: string, reason: stri
 };
 
 
-
-  const order = await Order.findByIdAndUpdate(
-    orderId,
-    payload,
-    { new: true, runValidators: true }
-  );
-
-  if (!order) {
-    throw new AppError('Order not found', StatusCodes.NOT_FOUND);
-  }
-  return order;
-};
 
 export const OrderService = {
     createOrderIntoDB,
