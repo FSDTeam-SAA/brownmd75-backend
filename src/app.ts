@@ -26,6 +26,9 @@ app.use('/api/v1', router);
 // Mount Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+
+app.use('/api/v1', router);
+
 app.get('/', (_req, res) => {
   res.send('Hey there! Welcome to our API.');
 });
