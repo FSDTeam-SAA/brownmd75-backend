@@ -4,6 +4,9 @@ import globalErrorHandler from './middleware/globalErrorHandler';
 import notFound from './middleware/notFound';
 import { applySecurity } from './middleware/security';
 import router from './router';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger.json';
+
 
 const app: Application = express();
 
@@ -16,6 +19,13 @@ app.use(express.static('public'));
 applySecurity(app);
 
 app.use(cookieParser());  // ← keep only cookieParser here
+
+
+app.use('/api/v1', router);
+
+// Mount Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
 app.use('/api/v1', router);
 

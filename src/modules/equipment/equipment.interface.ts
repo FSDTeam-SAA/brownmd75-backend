@@ -13,6 +13,7 @@ export interface IEquipment {
     title: string;
     image: IEquipmentImage;
     rating: number;
+    totalReviews: number;
 
     // Pricing
     price_per_hour: number;
@@ -30,6 +31,9 @@ export interface IEquipment {
     manufacture_year: number;     // e.g. 2022
     brand: string;                // e.g. "Caterpiller"
     rated_power: string;          // e.g. "4kw/Hour"
+
+    deliveryCharge: string;
+    setupCharge: string;
 
     // Status
     is_available: boolean;

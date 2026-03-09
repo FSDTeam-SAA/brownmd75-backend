@@ -23,6 +23,11 @@ export default {
     reset_password_token_expires: process.env.RESET_EXPIRES_IN,
   },
 
+  stripe: {
+    stripe_secret_key: process.env.STRIPE_SECRET_KEY,
+    stripe_public_key: process.env.STRIPE_PUBLIC_KEY,
+  },
+
   cloudinary: {
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,

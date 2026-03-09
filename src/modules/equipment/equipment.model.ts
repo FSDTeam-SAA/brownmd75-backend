@@ -23,6 +23,10 @@ const equipmentSchema = new Schema<IEquipment>(
             min: 0,
             max: 5,
         },
+        totalReviews: {
+            type: Number,
+            default: 0,
+        },
 
         // Pricing
         price_per_hour: { type: Number, required: true },
@@ -40,6 +44,9 @@ const equipmentSchema = new Schema<IEquipment>(
         manufacture_year: { type: Number, required: true },
         brand: { type: String, required: true },
         rated_power: { type: String, required: true },
+
+        deliveryCharge: { type: String, required: true },
+        setupCharge: { type: String, required: true },
 
         // Status
         is_available: { type: Boolean, default: true },

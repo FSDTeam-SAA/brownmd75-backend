@@ -5,6 +5,7 @@ import { Types } from "mongoose";
 export type TPaymentMethod = 'cod' | 'stripe';
 export type TOrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
 export type TPaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+export type TRefundStatus = 'none' | 'pending' | 'approved' | 'rejected';
 
 export interface IOrder {
   user: Types.ObjectId;
@@ -31,4 +32,6 @@ export interface IOrder {
   paymentStatus: TPaymentStatus;
   orderStatus: TOrderStatus;
   transactionId?: string; // For Stripe
+  refundRequestStatus: TRefundStatus; 
+  refundReason?: string;
 }

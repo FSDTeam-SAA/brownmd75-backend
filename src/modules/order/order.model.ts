@@ -41,6 +41,12 @@ const orderSchema = new Schema<IOrder>(
             default: 'pending',
         },
         transactionId: { type: String },
+        refundRequestStatus: {
+            type: String,
+            enum: ['none', 'pending', 'approved', 'rejected'],
+            default: 'none', // Critical so it exists on every order
+        },
+        refundReason: { type: String },
     },
     { timestamps: true }
 );
