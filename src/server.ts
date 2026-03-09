@@ -5,6 +5,8 @@ import app from "./app";
 import config from "./config";
 import logger from "./logger";
 import { initNotificationSocket } from "./socket/notification.service";
+import syncStripePayments from "./modules/cron/paymentSync";
+
 
 async function main() {
   try {
@@ -25,6 +27,10 @@ async function main() {
     });
 
     initNotificationSocket(io);
+
+    // --- START CRON JOB ---
+    syncStripePayments();
+    logger.info("Background Payment Sync Job initialized");
 
     httpServer.listen(config.port, () => {
       logger.info(`Server running on port ${config.port}`);

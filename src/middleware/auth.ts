@@ -16,7 +16,7 @@ const auth = (...roles: string[]) => {
 
       const verifyUserData = verifyToken(token, config.JWT_SECRET as string);
 
-      req.user = verifyUserData;
+      req.user = verifyUserData as any;
 
       if (roles.length && !roles.includes(verifyUserData.role)) {
         throw new AppError("You are not authorized!", StatusCodes.UNAUTHORIZED);

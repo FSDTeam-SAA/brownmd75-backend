@@ -13,6 +13,13 @@ router.post(
   loginLimiter,
   validateRequest(authValidationSchema.authValidation),
   authController.login
+  /* #swagger.parameters['body'] = {
+        in: 'body',
+        description: 'Login credentials',
+        required: true,
+        schema: { $ref: '#/definitions/Login' }
+     }
+  */
 );
 
 router.post("/refresh-token", authController.refreshToken);

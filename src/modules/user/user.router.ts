@@ -12,6 +12,13 @@ router.post(
   "/register",
   validateRequest(userValidation.userValidationSchema),
   userController.registerUser
+  /* #swagger.parameters['body'] = {
+        in: 'body',
+        description: 'New user registration',
+        required: true,
+        schema: { $ref: '#/definitions/Register' }
+     }
+  */
 );
 
 router.post(
