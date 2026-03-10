@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "swagger": "ts-node src/swagger.ts",
+    "swagger": "npx ts-node src/swagger.ts",
     "swagger-watch": "nodemon -x \"npm run swagger\" -e ts --ignore src/swagger.ts",
     "dev": "concurrently \"npm run swagger-watch\" \"ts-node-dev --respawn --transpile-only src/server.ts\"",
     "start": "node ./dist/server.js",
@@ -67,6 +67,7 @@
     "eslint": "^9.14.0",
     "globals": "^16.2.0",
     "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.0"
