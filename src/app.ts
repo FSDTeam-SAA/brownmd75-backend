@@ -30,7 +30,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1', router);
 
 app.get('/', (_req, res) => {
-  res.send('Hey there! Welcome to our API.');
+  res.send('Hey there! Welcome to our Rental Equipment API.');
 });
 
 app.use(notFound);
