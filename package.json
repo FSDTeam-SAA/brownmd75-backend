@@ -7,7 +7,7 @@
     "swagger-watch": "nodemon -x \"npm run swagger\" -e ts --ignore src/swagger.ts",
     "dev": "concurrently \"npm run swagger-watch\" \"ts-node-dev --respawn --transpile-only src/server.ts\"",
     "start": "node ./dist/server.js",
-    "build": "npm run swagger && tsc",
+    "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
