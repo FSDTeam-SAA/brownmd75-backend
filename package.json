@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "swagger": "npx ts-node --transpile-only src/swagger.ts",
+    "swagger": "ts-node --transpile-only src/swagger.ts",
     "swagger-watch": "nodemon -x \"npm run swagger\" -e ts --ignore src/swagger.ts",
     "dev": "concurrently \"npm run swagger-watch\" \"ts-node-dev --respawn --transpile-only src/server.ts\"",
     "start": "node ./dist/server.js",
