@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "swagger": "npx ts-node src/swagger.ts",
+    "swagger": "npx ts-node --transpile-only src/swagger.ts",
     "swagger-watch": "nodemon -x \"npm run swagger\" -e ts --ignore src/swagger.ts",
     "dev": "concurrently \"npm run swagger-watch\" \"ts-node-dev --respawn --transpile-only src/server.ts\"",
     "start": "node ./dist/server.js",
@@ -59,6 +59,7 @@
     "@types/hpp": "^0.2.7",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
+    "@types/node": "^25.4.0",
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^7.0.1",
     "@types/sanitize-html": "^2.16.0",
