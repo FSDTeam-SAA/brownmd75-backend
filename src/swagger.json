@@ -803,6 +803,19 @@
           "Review"
         ]
       }
+    },
+    "/analytics/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Analytics"
+        ]
+      }
     }
   },
   "definitions": {
