@@ -29,6 +29,7 @@ const getAllEquipments = catchAsync(async (req: Request, res: Response) => {
     message: "Equipments retrieved successfully",
     data: result.data,
     meta: result.meta,
+    analytics: result.analytics,
   });
 });
 

@@ -39,5 +39,6 @@ const EquipmentSchema = new Schema<IEquipment>(
   },
   { timestamps: true },
 );
+
 const Equipment = model<IEquipment>("Equipment", EquipmentSchema);
 export default Equipment;

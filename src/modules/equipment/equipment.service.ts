@@ -5,6 +5,7 @@ import {
   deleteFromCloudinary,
   uploadToCloudinary,
 } from "../../utils/cloudinary";
+import { Category } from "../category/category.model";
 import type { IEquipment } from "./equipment.interface";
 import Equipment from "./equipment.model";
 
@@ -120,6 +121,14 @@ const getAllEquipmentsFromDB = async (query: any) => {
 
   const total = await Equipment.countDocuments(filter);
 
+  // Analytics
+  const totalEquipments = await Equipment.countDocuments();
+  const totalAvailableEquipments = await Equipment.countDocuments({
+    status: "available",
+  });
+
+  const totalCategories = await Category.countDocuments();
+
   return {
     data,
     meta: {
@@ -127,6 +136,11 @@ const getAllEquipmentsFromDB = async (query: any) => {
       limit,
       total,
       totalPage: Math.ceil(total / limit),
+    },
+    analytics: {
+      totalEquipments,
+      totalAvailableEquipments,
+      totalCategories,
     },
   };
 };
