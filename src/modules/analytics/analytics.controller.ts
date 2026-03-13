@@ -25,11 +25,21 @@ const monthlyRevenueChart = catchAsync(async (req, res) => {
   });
 });
 
+const mostOrderedEquipment = catchAsync(async (req, res) => {
+  const result = await AnalyticsService.mostOrderedEquipment(req.query);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Most ordered equipment fetched successfully",
+    data: result,
+  });
+});
 
 const analyticsController = {
   dashboardAnalytics,
   monthlyRevenueChart,
+  mostOrderedEquipment,
 };
-
 
 export default analyticsController;

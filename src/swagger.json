@@ -829,6 +829,19 @@
           "Analytics"
         ]
       }
+    },
+    "/analytics/chart-equipment": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Analytics"
+        ]
+      }
     }
   },
   "definitions": {
