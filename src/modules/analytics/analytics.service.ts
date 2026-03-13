@@ -176,11 +176,69 @@ const monthlyRevenueChart = async (query: any) => {
   return allMonths;
 };
 
+const mostOrderedEquipment = async (query: any) => {
+  const type = query.type || "monthly"; // monthly, yearly, weekly
+  const currentYear = new Date().getFullYear();
+
+  // Set date range
+  let startDate = new Date(`${currentYear}-01-01`);
+  let endDate = new Date(`${currentYear}-12-31`);
+
+  if (type === "weekly") {
+    startDate = new Date();
+    startDate.setDate(startDate.getDate() - 6); // last 7 days
+    endDate = new Date();
+  } else if (type === "yearly" && query.year) {
+    const year = Number(query.year);
+    startDate = new Date(`${year}-01-01`);
+    endDate = new Date(`${year}-12-31`);
+  }
+
+  // Aggregate orders
+  const aggregation = await Order.aggregate([
+    {
+      $match: {
+        paymentStatus: "paid",
+        createdAt: { $gte: startDate, $lte: endDate },
+      },
+    },
+    { $unwind: "$items" }, // each item as separate document
+    {
+      $group: {
+        _id: "$items.equipment",
+        title: { $first: "$items.title" },
+        totalOrders: { $sum: "$items.quantity" },
+      },
+    },
+    { $sort: { totalOrders: -1 } },
+    { $limit: 5 }, // top 5 equipments
+  ]);
+
+  // Calculate total orders for percentage
+  const totalOrders = aggregation.reduce(
+    (sum, item) => sum + item.totalOrders,
+    0,
+  );
+
+  // Map percentage
+  const result = aggregation.map((item) => ({
+    equipmentId: item._id,
+    title: item.title,
+    orders: item.totalOrders,
+    percentage:
+      totalOrders > 0
+        ? ((item.totalOrders / totalOrders) * 100).toFixed(2)
+        : "0.00",
+  }));
+
+  return result;
+};
 
 
 const AnalyticsService = {
   dashboardAnalytics,
   monthlyRevenueChart,
+  mostOrderedEquipment,
 };
 
 export default AnalyticsService;
