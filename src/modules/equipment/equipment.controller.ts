@@ -3,12 +3,6 @@ import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import equipmentService from "./equipment.service";
-import type {
-  ListEquipmentQuery,
-  UpdateEquipmentBody,
-} from "./equipment.validation";
-
-// ─── Create ───────────────────────────────────────────────────────────────────
 
 const createEquipment = catchAsync(async (req, res) => {
   const files = req.files as Express.Multer.File[];
@@ -25,29 +19,26 @@ const createEquipment = catchAsync(async (req, res) => {
   });
 });
 
-// ─── Get All ──────────────────────────────────────────────────────────────────
-
 const getAllEquipments = catchAsync(async (req: Request, res: Response) => {
-  const query = req.query as unknown as ListEquipmentQuery;
-
+  const query = req.query;
   const result = await equipmentService.getAllEquipmentsFromDB(query);
 
-  res.status(StatusCodes.OK).json({
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
     success: true,
     message: "Equipments retrieved successfully",
-    meta: result.meta,
     data: result.data,
+    meta: result.meta,
   });
 });
-
-// ─── Get Single ───────────────────────────────────────────────────────────────
 
 const getSingleEquipment = catchAsync(async (req: Request, res: Response) => {
   const { equipmentId } = req.params;
 
   const result = await equipmentService.getSingleEquipmentFromDB(equipmentId);
 
-  res.status(StatusCodes.OK).json({
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
     success: true,
     message: "Equipment retrieved successfully",
     data: result,
@@ -58,16 +49,16 @@ const getSingleEquipment = catchAsync(async (req: Request, res: Response) => {
 
 const updateEquipment = catchAsync(async (req: Request, res: Response) => {
   const { equipmentId } = req.params;
-  const body = req.body as UpdateEquipmentBody;
-  const file = req.file;
+  const files = req.files as Express.Multer.File[];
 
   const result = await equipmentService.updateEquipmentIntoDB(
     equipmentId,
-    body,
-    file,
+    files as any,
+    req.body,
   );
 
-  res.status(StatusCodes.OK).json({
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
     success: true,
     message: "Equipment updated successfully",
     data: result,

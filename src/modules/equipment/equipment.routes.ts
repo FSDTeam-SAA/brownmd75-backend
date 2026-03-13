@@ -1,11 +1,8 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
 import { upload } from "../../middleware/multer.middleware";
-import parseFormData from "../../middleware/parseFormData";
-import validateRequest from "../../middleware/validateRequest";
 import { USER_ROLE } from "../user/user.constant";
 import equipmentController from "./equipment.controller";
-import { updateEquipmentSchema } from "./equipment.validation";
 
 const router = Router();
 
@@ -19,18 +16,15 @@ router.get("/:equipmentId", equipmentController.getSingleEquipment);
 router.post(
   "/create",
   upload.array("images", 5),
-  //   auth(USER_ROLE.ADMIN),
-  //   parseFormData,
-  //   validateRequest(createEquipmentSchema),
+  auth(USER_ROLE.ADMIN),
+
   equipmentController.createEquipment,
 );
 
-router.patch(
+router.put(
   "/:equipmentId",
-  upload.single("image"),
+  upload.array("images", 5),
   auth(USER_ROLE.ADMIN),
-  parseFormData,
-  validateRequest(updateEquipmentSchema),
   equipmentController.updateEquipment,
 );
 
