@@ -6,6 +6,7 @@ export interface IEquipmentImage {
 }
 
 export interface IEquipment {
+  _id: Types.ObjectId;
   title: string;
   description?: string;
   category: Types.ObjectId;
