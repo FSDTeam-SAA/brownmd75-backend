@@ -8,7 +8,7 @@ import { Order } from './order.model';
 import { IOrder } from './order.interface';
 import { IEquipment } from '../equipment/equipment.interface';
 import { PaymentService } from '../payment/payment.service';
-import { Equipment } from '../equipment/equipment.model';
+import  Equipment  from '../equipment/equipment.model';
 import Stripe from 'stripe';
 import config from '../../config';
 
