@@ -14,8 +14,22 @@ const dashboardAnalytics = catchAsync(async (req, res) => {
   });
 });
 
+const monthlyRevenueChart = catchAsync(async (req, res) => {
+  const result = await AnalyticsService.monthlyRevenueChart(req.query);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Revenue chart fetched successfully",
+    data: result,
+  });
+});
+
+
 const analyticsController = {
   dashboardAnalytics,
+  monthlyRevenueChart,
 };
+
 
 export default analyticsController;
