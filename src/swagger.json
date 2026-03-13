@@ -359,7 +359,7 @@
           "Equipments"
         ]
       },
-      "patch": {
+      "put": {
         "description": "",
         "parameters": [
           {
