@@ -79,8 +79,6 @@ const deleteEquipment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// ─── Toggle Availability ──────────────────────────────────────────────────────
-
 const toggleAvailability = catchAsync(async (req: Request, res: Response) => {
   const { equipmentId } = req.params;
 
@@ -88,12 +86,11 @@ const toggleAvailability = catchAsync(async (req: Request, res: Response) => {
 
   res.status(StatusCodes.OK).json({
     success: true,
-    message: `Equipment is now ${result.is_available ? "available" : "unavailable"}`,
+    message: `Equipment is now ${result.status ? "available" : "unavailable"}`,
     data: result,
   });
 });
 
-// ─── Export ───────────────────────────────────────────────────────────────────
 
 const equipmentController = {
   createEquipment,

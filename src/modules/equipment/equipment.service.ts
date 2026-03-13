@@ -156,7 +156,6 @@ const updateEquipmentIntoDB = async (
   files: Express.Multer.File[] | undefined,
   payload: Partial<IEquipment>,
 ): Promise<IEquipment> => {
-
   const equipment = await Equipment.findById(id);
 
   if (!equipment) {
@@ -195,7 +194,6 @@ const updateEquipmentIntoDB = async (
 
   // Only recalculate quantity if availableDates updated
   if (payload.availableDates && payload.availableDates.length > 0) {
-
     payload.availableDates = payload.availableDates.map((date) => ({
       startDate: new Date(date.startDate),
       endDate: new Date(date.endDate),
@@ -208,19 +206,13 @@ const updateEquipmentIntoDB = async (
     );
   }
 
-  const updatedEquipment = await Equipment.findByIdAndUpdate(
-    id,
-    payload,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const updatedEquipment = await Equipment.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
 
   return updatedEquipment as IEquipment;
 };
-
-// ─── Delete ───────────────────────────────────────────────────────────────────
 
 const deleteEquipmentFromDB = async (id: string): Promise<void> => {
   if (!isValidObjectId(id)) {
@@ -230,43 +222,20 @@ const deleteEquipmentFromDB = async (id: string): Promise<void> => {
   const equipment = await Equipment.findById(id);
 
   if (!equipment) {
-    throw new AppError(
-      `Equipment not found with id: ${id}`,
-      StatusCodes.NOT_FOUND,
-    );
+    throw new AppError(`Equipment not found`, StatusCodes.NOT_FOUND);
   }
 
-  // Delete image from Cloudinary
-  if (equipment.images?.public_id) {
-    await deleteFromCloudinary(equipment.images.public_id);
+  // Delete images from Cloudinary
+  if (equipment.images && equipment.images.length > 0) {
+    for (const image of equipment.images) {
+      if (image.public_id) {
+        await deleteFromCloudinary(image.public_id);
+      }
+    }
   }
 
   await Equipment.findByIdAndDelete(id);
 };
-
-// ─── Toggle Availability ──────────────────────────────────────────────────────
-
-// const toggleAvailabilityFromDB = async (id: string): Promise<IEquipment> => {
-//     if (!isValidObjectId(id)) {
-//         throw new AppError('Invalid equipment ID format', StatusCodes.BAD_REQUEST);
-//     }
-
-//     const equipment = await Equipment.findById(id);
-
-//     if (!equipment) {
-//         throw new AppError(
-//             `Equipment not found with id: ${id}`,
-//             StatusCodes.NOT_FOUND
-//         );
-//     }
-
-//     equipment.is_available = !equipment.is_available;
-//     await equipment.save();
-
-//     return equipment;
-// };
-
-// ─── Toggle Availability (Optimized) ──────────────────────────────────────────
 
 const toggleAvailabilityFromDB = async (id: string): Promise<IEquipment> => {
   if (!isValidObjectId(id)) {
@@ -286,7 +255,7 @@ const toggleAvailabilityFromDB = async (id: string): Promise<IEquipment> => {
   // 2. Perform atomic update with the flipped value
   const updatedEquipment = await Equipment.findByIdAndUpdate(
     id,
-    { $set: { is_available: !equipment.is_available } },
+    { $set: { status: !equipment.status } },
     { new: true, runValidators: true },
   );
 
@@ -299,8 +268,6 @@ const toggleAvailabilityFromDB = async (id: string): Promise<IEquipment> => {
 
   return updatedEquipment;
 };
-
-// ─── Export ───────────────────────────────────────────────────────────────────
 
 const equipmentService = {
   createEquipmentIntoDB,
