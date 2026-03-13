@@ -816,6 +816,19 @@
           "Analytics"
         ]
       }
+    },
+    "/analytics/chart-revenue": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Analytics"
+        ]
+      }
     }
   },
   "definitions": {
