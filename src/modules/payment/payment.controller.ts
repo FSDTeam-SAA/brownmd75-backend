@@ -27,6 +27,23 @@ const verifyPayment = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getPaymentHistory = catchAsync(async (req: Request, res: Response) => {
+    // Extract page and limit from query, defaulting to 1 and 10 respectively
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const { PaymentService } = await import('./payment.service');
+    const result = await PaymentService.getPaymentHistoryFromDB(page, limit);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Payment history retrieved successfully',
+        data: result,
+    });
+});
+
 export const PaymentController = {
     verifyPayment,
+    getPaymentHistory,
 };

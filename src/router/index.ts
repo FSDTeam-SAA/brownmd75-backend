@@ -9,6 +9,8 @@ import { OrderRouter } from "../modules/order/order.routes";
 import { ReviewRouter } from "../modules/review/review.routes";
 import userRouter from "../modules/user/user.router";
 
+import { PaymentRouter } from "../modules/payment/payment.routes";
+
 const router = Router();
 
 router.use("/user", userRouter);
@@ -20,5 +22,6 @@ router.use("/cart", cartRouter);
 router.use("/order", OrderRouter);
 router.use("/review", ReviewRouter);
 router.use("/analytics", analyticsRouter);
+router.use("/payment", PaymentRouter);
 
 export default router;

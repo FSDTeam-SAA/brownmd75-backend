@@ -177,7 +177,43 @@ const verifyPaymentInDB = async (orderId: string, transactionId: string) => {
 
 
 
+const getPaymentHistoryFromDB = async (page: number = 1, limit: number = 10) => {
+    // 1. Calculate skip parameter
+    const skip = (page - 1) * limit;
+
+    // 2. Fetch paginated orders
+    const orders = await Order.find()
+        .populate('user', 'name email profileImg')
+        .populate('items.equipment', 'title')
+        .sort('-createdAt')
+        .skip(skip)
+        .limit(limit);
+
+    // 3. Get total count of all orders for meta data
+    const total = await Order.countDocuments();
+
+    // 4. Calculate total revenue across ALL "paid" orders (bypass pagination)
+    // We execute an aggregation pipeline for efficiency instead of fetching all docs.
+    const revenueAggregation = await Order.aggregate([
+        { $match: { paymentStatus: 'paid' } },
+        { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } }
+    ]);
+    const totalRevenue = revenueAggregation.length > 0 ? revenueAggregation[0].totalRevenue : 0;
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage: Math.ceil(total / limit),
+        },
+        totalRevenue,
+        payments: orders,
+    };
+};
+
 export const PaymentService = {
     createPaymentIntent,
     verifyPaymentInDB,
+    getPaymentHistoryFromDB,
 };
