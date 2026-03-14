@@ -13,6 +13,20 @@ router.get(
     PaymentController.getPaymentHistory
 );
 
+// Admin: Get Single Payment History
+router.get(
+    '/history/:orderId',
+    auth(USER_ROLE.ADMIN),
+    PaymentController.getSinglePaymentHistory
+);
+
+// Admin: Delete Payment History
+router.delete(
+    '/history/:orderId',
+    auth(USER_ROLE.ADMIN),
+    PaymentController.deletePaymentHistory
+);
+
 // We keep verify-payment here if needed, or in order.routes.ts
 // The prompt asked for GET /history route with Admin middleware.
 

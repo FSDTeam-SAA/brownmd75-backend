@@ -43,7 +43,36 @@ const getPaymentHistory = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getSinglePaymentHistory = catchAsync(async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+    const { PaymentService } = await import('./payment.service');
+    const result = await PaymentService.getSinglePaymentHistoryFromDB(orderId);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Individual payment history retrieved successfully',
+        data: result,
+    });
+});
+
+const deletePaymentHistory = catchAsync(async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+    const { PaymentService } = await import('./payment.service');
+    const result = await PaymentService.deletePaymentHistoryFromDB(orderId);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Payment history record deleted successfully',
+        data: result,
+    });
+});
+
+
 export const PaymentController = {
     verifyPayment,
     getPaymentHistory,
+    getSinglePaymentHistory,
+    deletePaymentHistory,
 };
