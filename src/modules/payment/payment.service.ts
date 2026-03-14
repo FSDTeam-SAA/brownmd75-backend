@@ -212,8 +212,42 @@ const getPaymentHistoryFromDB = async (page: number = 1, limit: number = 10) => 
     };
 };
 
+
+
+const getSinglePaymentHistoryFromDB = async (orderId: string) => {
+    const order = await Order.findById(orderId)
+        .populate('user', 'name email profileImg')
+        .populate('items.equipment', 'title');
+
+    if (!order) {
+        throw new AppError('Payment history not found for this ID', 404);
+    }
+
+    return order;
+};
+
+const deletePaymentHistoryFromDB = async (orderId: string) => {
+    // In many business applications, you don't actually delete an order record 
+    // just because an admin "deleted it" from the "payment history" view. 
+    // However, to satisfy the requirement verbatim, we delete the Order.
+    const deletedOrder = await Order.findByIdAndDelete(orderId);
+
+    if (!deletedOrder) {
+        throw new AppError('Payment history not found for this ID', 404);
+    }
+    
+    // We should safely clear associated payments if it was a Stripe order
+    if (deletedOrder.paymentMethod === 'stripe') {
+        await Payment.deleteMany({ order: orderId });
+    }
+
+    return deletedOrder;
+};
+
 export const PaymentService = {
     createPaymentIntent,
     verifyPaymentInDB,
     getPaymentHistoryFromDB,
+    getSinglePaymentHistoryFromDB,
+    deletePaymentHistoryFromDB,
 };
