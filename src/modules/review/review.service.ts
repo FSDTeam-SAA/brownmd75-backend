@@ -1,6 +1,5 @@
 import { IReview } from './review.interface';
 import { Review } from './review.model';
-import { Order } from '../order/order.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import Equipment from '../equipment/equipment.model';
@@ -8,36 +7,9 @@ import Equipment from '../equipment/equipment.model';
 /**
  * Verified Review Service
  */
-const createReviewInDB = async (userId: string, payload: Partial<IReview>) => {
-    const { reviewType, equipment, order } = payload;
-
-    // --- LOGIC 1: EQUIPMENT REVIEW VERIFICATION ---
-    if (reviewType === 'equipment') {
-        if (!equipment || !order) {
-            throw new AppError(
-                "Equipment ID and Order ID are required for equipment reviews.",
-                httpStatus.BAD_REQUEST
-            );
-        }
-
-        // Verified Purchase Check
-        const verifiedOrder = await Order.findOne({
-            _id: order,
-            user: userId,
-            orderStatus: { $in: ['delivered', 'completed'] },
-            'items.equipment': equipment,
-        });
-
-        if (!verifiedOrder) {
-            throw new AppError(
-                "Verification failed. You can only review equipment you have received and used.",
-                httpStatus.FORBIDDEN
-            );
-        }
-    }
-
+const createReviewInDB = async (userId: string | undefined, payload: Partial<IReview>) => {
     // --- FINAL STEP: CREATE ---
-    // We use ...payload here, so rating and comment are passed safely to the DB
+    // Anyone can create a review now (user or non-user)
     const result = await Review.create({
         user: userId,
         ...payload,
