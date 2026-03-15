@@ -29,7 +29,6 @@ const reviewSchema = new Schema<IReview>({
     },
     comment: {
         type: String,
-        required: true
     },
     isPublished: {
         type: Boolean,

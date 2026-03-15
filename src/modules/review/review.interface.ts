@@ -5,16 +5,14 @@ export type TReviewType = 'equipment' | 'website';
 
 export interface IReview {
     user?: Types.ObjectId;       // The reviewer (Optional for anonymous)
-    reviewType: TReviewType;    // Discriminator
-
-    // Equipment-specific fields (Optional because Website reviews don't need them)
+    reviewType?: TReviewType;    // Discriminator
     equipment?: Types.ObjectId;
     order?: Types.ObjectId;
 
     // Common fields
-    rating: number;             // 1 to 5
-    comment: string;            // The feedback text
-    isPublished: boolean;       // To allow admin to hide inappropriate content
+    rating?: number;             // 1 to 5
+    comment?: string;            // The feedback text
+    isPublished?: boolean;       // To allow admin to hide inappropriate content
     createdAt?: Date;
     updatedAt?: Date;
 }
