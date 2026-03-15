@@ -1,5 +1,5 @@
 import { Schema, Types, model } from 'mongoose';
-import { Equipment } from '../equipment/equipment.model';
+import Equipment from '../equipment/equipment.model';
 import { IReview, IReviewModel } from './review.interface';
 
 const reviewSchema = new Schema<IReview>({

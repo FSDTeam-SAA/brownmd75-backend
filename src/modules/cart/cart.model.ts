@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { ICart } from './cart.interface';
-import { Equipment } from '../equipment/equipment.model';
+import Equipment from '../equipment/equipment.model';
 
 
 const cartSchema = new Schema<ICart>({
@@ -39,7 +39,7 @@ cartSchema.pre('save', async function (next) {
 
         const total = cart.items.reduce((acc, item) => {
             const equipmentDoc = equipments.find(
-                (e) => e._id.toString() === item.equipment.toString()
+                (e: any) => e._id.toString() === item.equipment.toString()
             );
 
             if (equipmentDoc) {

@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../errors/AppError';
 import { Cart } from './cart.model';
 import { TRentalType } from './cart.interface';
-import { Equipment } from '../equipment/equipment.model';
+import Equipment from '../equipment/equipment.model';
 import { Types } from 'mongoose';
 
 /**
@@ -24,7 +24,7 @@ const addToCartIntoDB = async (
     if (!equipment) {
         throw new AppError('Equipment not found', StatusCodes.NOT_FOUND);
     }
-    if (!equipment.is_available) {
+    if (equipment.status !== 'available') {
         throw new AppError('Equipment is currently not available', StatusCodes.BAD_REQUEST);
     }
 

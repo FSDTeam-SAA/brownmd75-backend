@@ -3,7 +3,7 @@ import { Review } from './review.model';
 import { Order } from '../order/order.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
-import { Equipment } from '../equipment/equipment.model';
+import Equipment from '../equipment/equipment.model';
 
 /**
  * Verified Review Service
