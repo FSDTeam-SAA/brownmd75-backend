@@ -5,8 +5,7 @@ import { IReview, IReviewModel } from './review.interface';
 const reviewSchema = new Schema<IReview>({
     user: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: 'User'
     },
     reviewType: {
         type: String,
@@ -39,7 +38,8 @@ const reviewSchema = new Schema<IReview>({
 }, { timestamps: true });
 
 // Prevent duplicate reviews: One user, one order, one equipment = One Review
-reviewSchema.index({ user: 1, equipment: 1, order: 1 }, { unique: true });
+// Duplicate reviews are now allowed in the simplified system
+// reviewSchema.index({ user: 1, equipment: 1, order: 1 }, { unique: true });
 
 // --- THE AGGREGATION LOGIC ---
 
