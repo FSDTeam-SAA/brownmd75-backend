@@ -78,16 +78,6 @@ const getAllEquipmentsFromDB = async (query: any) => {
     filter.manufacture_year = Number(query.manufacture_year);
   }
 
-  // Weight filter
-  if (query.min_weight || query.max_weight) {
-    const weightFilter: Record<string, number> = {};
-
-    if (query.min_weight) weightFilter.$gte = Number(query.min_weight);
-    if (query.max_weight) weightFilter.$lte = Number(query.max_weight);
-
-    filter.weight = weightFilter;
-  }
-
   // Price filter
   if (query.min_price || query.max_price) {
     const priceFilter: Record<string, number> = {};
@@ -98,16 +88,13 @@ const getAllEquipmentsFromDB = async (query: any) => {
     filter.price_per_hour = priceFilter;
   }
 
-  // Date range filter
+  // Date range filter (for single object)
   if (query.startDate && query.endDate) {
-    filter.availableDates = {
-      $elemMatch: {
-        startDate: { $lte: new Date(query.startDate) },
-        endDate: { $gte: new Date(query.endDate) },
-      },
-    };
+    filter["availableDates.startDate"] = { $lte: new Date(query.startDate) };
+    filter["availableDates.endDate"] = { $gte: new Date(query.endDate) };
   }
 
+  // Sorting
   const sortField = query.sortBy || "createdAt";
   const sortOrder = query.sortOrder === "asc" ? 1 : -1;
 
