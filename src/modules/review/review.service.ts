@@ -3,7 +3,7 @@ import { Review } from './review.model';
 import { Order } from '../order/order.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
-import { Equipment } from '../equipment/equipment.model';
+import  Equipment  from '../equipment/equipment.model';
 
 /**
  * Verified Review Service
@@ -66,7 +66,7 @@ const getAllReviewsFromDB = async (query: Record<string, unknown>) => {
 
   // Execute Query
   const result = await Review.find(queryObj)
-    .populate('user', 'fullName image')
+    .populate('user', 'firstName lastName image')
     .sort(sort)
     .skip(skip)
     .limit(limit)
