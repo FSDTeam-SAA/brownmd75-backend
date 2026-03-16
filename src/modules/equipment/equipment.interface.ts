@@ -24,7 +24,7 @@ export interface IEquipment {
     startDate: Date;
     endDate: Date;
     quantity: number;
-  }[];
+  };
   model?: string;
   manufacture_year?: number;
   brand?: string;

@@ -15,30 +15,28 @@ const createEquipmentIntoDB = async (
 ): Promise<IEquipment> => {
   // 1️⃣ Upload images
   const uploadedImages = [];
+
   for (const file of files) {
     const uploadResult = await uploadToCloudinary(file.path, "equipments");
+
     uploadedImages.push({
       public_id: uploadResult.public_id,
       url: uploadResult.secure_url,
     });
   }
+
   payload.images = uploadedImages;
 
-  // 2️⃣ Ensure availableDates is parsed correctly
-  if (payload.availableDates && payload.availableDates.length > 0) {
-    payload.availableDates = payload.availableDates.map((date) => ({
-      startDate: new Date(date.startDate),
-      endDate: new Date(date.endDate),
-      quantity: Number(date.quantity) || 0,
-    }));
+  // 2️⃣ Parse availableDates (single object)
+  if (payload.availableDates) {
+    payload.availableDates = {
+      startDate: new Date(payload.availableDates.startDate),
+      endDate: new Date(payload.availableDates.endDate),
+      quantity: Number(payload.availableDates.quantity) || 0,
+    };
 
-    // Calculate total quantity
-    payload.quantity = payload.availableDates.reduce(
-      (sum, date) => sum + date.quantity,
-      0,
-    );
-  } else {
-    payload.quantity = 0;
+    // quantity sync
+    // payload.quantity = payload.availableDates.quantity;
   }
 
   // 3️⃣ Create equipment
@@ -176,7 +174,7 @@ const updateEquipmentIntoDB = async (
     throw new AppError("Equipment not found", StatusCodes.NOT_FOUND);
   }
 
-  // Upload new images
+  // 1️⃣ Upload new images
   if (files && files.length > 0) {
     const uploadedImages = [];
 
@@ -189,7 +187,7 @@ const updateEquipmentIntoDB = async (
       });
     }
 
-    // Delete old images
+    // delete old images
     if (equipment.images?.length) {
       for (const image of equipment.images) {
         if (image.public_id) {
@@ -201,25 +199,24 @@ const updateEquipmentIntoDB = async (
     payload.images = uploadedImages as any;
   }
 
-  // Parse availableDates if string
+  // 2️⃣ Parse availableDates if it comes as string
   if (payload.availableDates && typeof payload.availableDates === "string") {
     payload.availableDates = JSON.parse(payload.availableDates);
   }
 
-  // Only recalculate quantity if availableDates updated
-  if (payload.availableDates && payload.availableDates.length > 0) {
-    payload.availableDates = payload.availableDates.map((date) => ({
-      startDate: new Date(date.startDate),
-      endDate: new Date(date.endDate),
-      quantity: Number(date.quantity) || 0,
-    }));
+  // 3️⃣ Fix availableDates (single object)
+  if (payload.availableDates) {
+    payload.availableDates = {
+      startDate: new Date(payload.availableDates.startDate),
+      endDate: new Date(payload.availableDates.endDate),
+      quantity: Number(payload.availableDates.quantity) || 0,
+    };
 
-    payload.quantity = payload.availableDates.reduce(
-      (sum, date) => sum + date.quantity,
-      0,
-    );
+    // sync quantity
+    // payload.quantity = payload.availableDates.quantity;
   }
 
+  // 4️⃣ Update equipment
   const updatedEquipment = await Equipment.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
