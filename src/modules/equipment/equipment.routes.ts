@@ -17,7 +17,6 @@ router.post(
   "/create",
   upload.array("images", 5),
   auth(USER_ROLE.ADMIN),
-
   equipmentController.createEquipment,
 );
 

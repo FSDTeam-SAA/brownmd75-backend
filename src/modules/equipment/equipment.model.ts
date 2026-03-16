@@ -20,14 +20,12 @@ const EquipmentSchema = new Schema<IEquipment>(
     price_per_month: { type: Number },
     deliveryCharge: { type: Number },
     setupCharge: { type: Number },
-    quantity: { type: Number },
-    availableDates: [
-      {
-        startDate: { type: Date, required: true },
-        endDate: { type: Date, required: true },
-        quantity: { type: Number, required: true },
-      },
-    ],
+    // quantity: { type: Number },
+    availableDates: {
+      startDate: { type: Date, required: true },
+      endDate: { type: Date, required: true },
+      quantity: { type: Number, required: true },
+    },
     model: { type: String },
     manufacture_year: { type: Number },
     brand: { type: String },
