@@ -81,8 +81,20 @@ const updateCategory = async (
 };
 
 const deleteCategory = async (id: string) => {
-  throw new Error("This api completed later");
+  const isCategoryExist = await Category.findById(id);
+
+  if (!isCategoryExist) {
+    throw new Error("Category not found");
+  }
+
+  if (isCategoryExist.image?.public_id) {
+    await deleteFromCloudinary(isCategoryExist.image.public_id);
+  }
+
+  const result = await Category.findByIdAndDelete(id);
+  return result;
 };
+
 
 const categoryService = {
   createCategory,
