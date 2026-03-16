@@ -159,7 +159,7 @@ const resendOtpCode = async (email: string) => {
 
 const getAllUsers = async () => {
   const result = await User.find().select(
-    "username firstName lastName email role"
+    "username firstName lastName email role createdAt updatedAt"
   );
   return result;
 };
@@ -219,6 +219,14 @@ const updateUserProfile = async (payload: any, email: string, file: any) => {
   return result;
 };
 
+const deleteUserFromDB = async (userId: string) => {
+  const user = await User.findById(userId);
+  if (!user) throw new AppError("User not found", StatusCodes.NOT_FOUND);
+
+  const result = await User.findByIdAndDelete(userId);
+  return result;
+};
+
 const userService = {
   registerUser,
   verifyEmail,
@@ -227,6 +235,7 @@ const userService = {
   getMyProfile,
   updateUserProfile,
   getAdminId,
+  deleteUserFromDB
 };
 
 export default userService;
