@@ -645,6 +645,32 @@
         ]
       }
     },
+    "/order/success": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Order"
+        ]
+      }
+    },
+    "/order/cancel": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Order"
+        ]
+      }
+    },
     "/order/cancel/{orderId}": {
       "patch": {
         "description": "",

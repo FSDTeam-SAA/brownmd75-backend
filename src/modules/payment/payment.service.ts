@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import { Order } from '../order/order.model';
 import AppError from '../../errors/AppError';
 import { Cart } from '../cart/cart.model';
+import { StatusCodes } from 'http-status-codes';
+
 
 
 import { Payment } from './payment.model';
@@ -30,91 +32,66 @@ const createPaymentIntent = async (amount: number) => {
     };
 };
 
-// const verifyPaymentInDB = async (orderId: string, transactionId: string) => {
-//     // 1. Verify with Stripe API first
-//     const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
+const createCheckoutSession = async (items: any[], totalAmount: number, orderId: string) => {
+    const lineItems = items.map((item) => ({
+        price_data: {
+            currency: 'usd',
+            product_data: {
+                name: item.title,
+            },
+            unit_amount: Math.round(item.priceAtBooking * 100),
+        },
+        quantity: item.quantity,
+    }));
 
-//     if (paymentIntent.status !== 'succeeded') {
-//         throw new AppError('Payment has not succeeded yet', 400);
-//     }
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'payment',
+        success_url: `http://localhost:5000/api/v1/order/success?orderId=${orderId}`, // Dynamic fallback for local testing
+        cancel_url: `http://localhost:5000/api/v1/order/cancel?orderId=${orderId}`,
+        metadata: {
+            orderId: orderId.toString(),
+        },
+    });
 
-//     const session = await mongoose.startSession();
-//     try {
-//         session.startTransaction();
-
-//         // 2. Update Order Status & POPULATE user to get the email
-//         const order = await Order.findByIdAndUpdate(
-//             orderId,
-//             { paymentStatus: 'paid', orderStatus: 'confirmed' },
-//             { new: true, session }
-//         ).populate('user');
-
-//         if (!order) throw new AppError("Order not found", 404);
-
-//         // 3. Record the Payment
-//         await Payment.create([{
-//             user: order.user,
-//             order: order._id,
-//             transactionId: transactionId,
-//             amount: paymentIntent.amount / 100,
-//             status: 'succeeded'
-//         }], { session });
-
-//         // 4. Clear the User's Cart
-//         await Cart.findOneAndUpdate(
-//             { user: order.user },
-//             { items: [], totalPrice: 0 },
-//             { session }
-//         );
-
-//         await session.commitTransaction();
-
-//         // 5. Send Email (Do this AFTER commit so it doesn't block the DB transaction)
-//         const userEmail = (order.user as any)?.email;
-//         if (userEmail) {
-//             const emailHtml = `
-//                 <div style="font-family: sans-serif; padding: 20px;">
-//                     <h2>Payment Successful!</h2>
-//                     <p>Hi ${(order.user as any)?.name || 'Valued Customer'},</p>
-//                     <p>Your payment for Order <strong>#${order._id}</strong> has been received.</p>
-//                     <p><strong>Total Amount:</strong> $${order.totalAmount}</p>
-//                     <p>Our team is now preparing your equipment for delivery.</p>
-//                     <hr />
-//                     <p>Thank you for choosing BrownMd!</p>
-//                 </div>
-//             `;
-
-//             sendEmail({
-//                 to: userEmail,
-//                 subject: 'Payment Confirmation - BrownMd',
-//                 html: emailHtml
-//             });
-//         }
-
-//         return order;
-//     } catch (error) {
-//         await session.abortTransaction();
-//         throw error;
-//     } finally {
-//         await session.endSession();
-//     }
-// };
-
+    return {
+        checkoutUrl: session.url,
+        transactionId: session.id, // This is the checkout session ID
+    };
+};
 
 
 const verifyPaymentInDB = async (orderId: string, transactionId: string) => {
+
     // 1. Verify with Stripe API first
-    // const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
-    
-    // if (paymentIntent.status !== 'succeeded') {
-    //     throw new AppError('Payment has not succeeded yet', 400);
-    // }
+    if (transactionId.startsWith('cs_')) {
+        const session = await stripe.checkout.sessions.retrieve(transactionId);
+        if (session.payment_status !== 'paid') {
+            throw new AppError('Payment has not been completed via Checkout Session', StatusCodes.BAD_REQUEST);
+        }
+    } else {
+        const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
+        if (paymentIntent.status !== 'succeeded') {
+            throw new AppError('Payment has not succeeded yet via Payment Intent', StatusCodes.BAD_REQUEST);
+        }
+    }
+
+    // 2. Check if this payment has already been recorded (IDEMPOTENCY)
+    const existingPayment = await Payment.findOne({ transactionId });
+    if (existingPayment) {
+        const order = await Order.findById(orderId).populate('user');
+        if (order && order.paymentStatus === 'paid') {
+            return order; // Already processed, return gracefully
+        }
+        // If payment exists but order isn't updated, we continue to fix it
+    }
 
     const session = await mongoose.startSession();
     try {
         session.startTransaction();
 
-        // 2. Update Order Status & POPULATE user
+        // 3. Update Order Status & POPULATE user
         const order = await Order.findByIdAndUpdate(
             orderId,
             { paymentStatus: 'paid', orderStatus: 'confirmed' },
@@ -123,34 +100,33 @@ const verifyPaymentInDB = async (orderId: string, transactionId: string) => {
 
         if (!order) throw new AppError("Order not found", 404);
 
-        // 3. Record the Payment 
-        // FIX: Use order.totalAmount here because paymentIntent is commented out
-        await Payment.create([{
-            user: order.user,
-            order: order._id,
-            transactionId: transactionId,
-            amount: order.totalAmount, // Use the DB totalAmount for testing
-            status: 'succeeded'
-        }], { session });
+        // 4. Record the Payment (Only if it doesn't exist)
+        if (!existingPayment) {
+            await Payment.create([{
+                user: order.user,
+                order: order._id,
+                transactionId: transactionId,
+                amount: order.totalAmount,
+                status: 'succeeded'
+            }], { session });
+        }
 
-        // 4. Clear the User's Cart
+        // 5. Clear the User's Cart
         await Cart.findOneAndUpdate(
-            { user: order.user },
+            { user: (order.user as any)?._id || order.user },
             { items: [], totalPrice: 0 },
             { session }
         );
 
         await session.commitTransaction();
 
-        // 5. Send Email logic... (rest of your code)
-        // ...
-        // 5. Send Email (Do this AFTER commit so it doesn't block the DB transaction)
+        // 6. Send Confirmation Email
         const userEmail = (order.user as any)?.email;
         if (userEmail) {
             const emailHtml = `
                 <div style="font-family: sans-serif; padding: 20px;">
                     <h2>Payment Successful!</h2>
-                    <p>Hi ${ (order.user as any)?.name || 'Valued Customer'},</p>
+                    <p>Hi ${(order.user as any)?.name || 'Valued Customer'},</p>
                     <p>Your payment for Order <strong>#${order._id}</strong> has been received.</p>
                     <p><strong>Total Amount:</strong> $${order.totalAmount}</p>
                     <p>Our team is now preparing your equipment for delivery.</p>
@@ -174,6 +150,7 @@ const verifyPaymentInDB = async (orderId: string, transactionId: string) => {
         await session.endSession();
     }
 };
+
 
 
 
@@ -246,6 +223,7 @@ const deletePaymentHistoryFromDB = async (orderId: string) => {
 
 export const PaymentService = {
     createPaymentIntent,
+    createCheckoutSession,
     verifyPaymentInDB,
     getPaymentHistoryFromDB,
     getSinglePaymentHistoryFromDB,
