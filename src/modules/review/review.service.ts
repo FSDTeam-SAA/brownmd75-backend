@@ -38,7 +38,7 @@ const getAllReviewsFromDB = async (query: Record<string, unknown>) => {
 
   // Execute Query
   const result = await Review.find(queryObj)
-    .populate('user', 'fullName image')
+    .populate('user', 'firstName lastName image')
     .sort(sort)
     .skip(skip)
     .limit(limit)
