@@ -1,4 +1,4 @@
-﻿// src/modules/order/order.service.ts
+// src/modules/order/order.service.ts
 
 import mongoose, { Types } from 'mongoose';
 import { StatusCodes } from 'http-status-codes';
@@ -61,13 +61,24 @@ const createOrderIntoDB = async (userId: string, payload: Partial<IOrder>) => {
         };
 
         let clientSecret = null;
+        let checkoutUrl = null;
 
-        // 4. Handle Stripe Payment Intent (Branching Logic)
+        // 4. Handle Stripe Payment Intent & Checkout Session (Branching Logic)
         if (payload.paymentMethod === 'stripe') {
+            // Create Checkout Session for Redirect
+            const orderIdForStripe = new Types.ObjectId(); // Generate ID early if needed or use newOrder._id later
+            // Since we need order items snapshot, we use orderItems prepared above
+            
+            const checkoutSession = await PaymentService.createCheckoutSession(orderItems, cart.totalPrice, orderIdForStripe.toString());
+            checkoutUrl = checkoutSession.checkoutUrl;
+            orderData.transactionId = checkoutSession.transactionId;
+            orderData._id = orderIdForStripe; // Use the same ID for the order
+
+            // Also create Payment Intent if needed for embedded forms (optional)
             const paymentIntent = await PaymentService.createPaymentIntent(cart.totalPrice);
-            orderData.transactionId = paymentIntent.transactionId; // Store the Stripe ID (pi_...)
-            clientSecret = paymentIntent.clientSecret; // Send this to frontend
+            clientSecret = paymentIntent.clientSecret;
         }
+
 
         // 5. Create the Order in DB
         const [newOrder] = await Order.create([orderData], { session });
@@ -90,6 +101,7 @@ const createOrderIntoDB = async (userId: string, payload: Partial<IOrder>) => {
         return {
             order: newOrder,
             clientSecret,
+            checkoutUrl,
         };
     } catch (error: any) {
         await session.abortTransaction();

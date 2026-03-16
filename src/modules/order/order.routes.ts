@@ -30,8 +30,18 @@ router.patch('/:orderId', auth(USER_ROLE.ADMIN), OrderController.updateOrderStat
 router.post(
     '/verify-payment',
     auth(USER_ROLE.USER),
-    OrderController.verifyPayment // We'll create this controller method next
+    OrderController.verifyPayment 
 );
+
+// Simple GET routes for Stripe Redirect Testing
+router.get('/success', (req, res) => {
+    res.send('<h1>Payment Successful!</h1><p>You can close this window now.</p>');
+});
+
+router.get('/cancel', (req, res) => {
+    res.send('<h1>Payment Cancelled</h1><p>Please try again.</p>');
+});
+
 
 // User must be logged in to cancel their own order
 router.patch(
