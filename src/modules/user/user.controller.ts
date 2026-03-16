@@ -96,6 +96,18 @@ const updateUserProfile = catchAsync(async (req, res) => {
   });
 });
 
+const deleteUser = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const result = await userService.deleteUserFromDB(userId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "User deleted successfully.",
+    data: result,
+  });
+});
+
 const userController = {
   registerUser,
   verifyEmail,
@@ -104,6 +116,7 @@ const userController = {
   getMyProfile,
   updateUserProfile,
   getAdminId,
+  deleteUser
 };
 
 export default userController;

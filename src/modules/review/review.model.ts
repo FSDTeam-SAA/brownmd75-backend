@@ -1,13 +1,12 @@
-import { Schema, Types, model } from "mongoose";
-import Equipment from "../equipment/equipment.model";
-import { IReview, IReviewModel } from "./review.interface";
+import { Schema, Types, model } from 'mongoose';
+import Equipment from '../equipment/equipment.model';
+import { IReview, IReviewModel } from './review.interface';
 
 const reviewSchema = new Schema<IReview>(
   {
     user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
     reviewType: {
       type: String,
@@ -30,8 +29,7 @@ const reviewSchema = new Schema<IReview>(
       max: [5, "Maximum rating is 5"], // This stops the 5+ star trick
     },
     comment: {
-      type: String,
-      required: true,
+        type: String,
     },
     isPublished: {
       type: Boolean,
@@ -42,7 +40,8 @@ const reviewSchema = new Schema<IReview>(
 );
 
 // Prevent duplicate reviews: One user, one order, one equipment = One Review
-reviewSchema.index({ user: 1, equipment: 1, order: 1 }, { unique: true });
+// Duplicate reviews are now allowed in the simplified system
+// reviewSchema.index({ user: 1, equipment: 1, order: 1 }, { unique: true });
 
 // --- THE AGGREGATION LOGIC ---
 

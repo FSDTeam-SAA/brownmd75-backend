@@ -23,7 +23,7 @@ router.put(
 );
 router.delete(
   "/delete/:id",
-//   auth(USER_ROLE.ADMIN),
+  auth(USER_ROLE.ADMIN),
   categoryController.deleteCategory,
 );
 

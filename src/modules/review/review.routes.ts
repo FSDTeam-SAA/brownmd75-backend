@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.post(
   '/create-review',
-  auth(USER_ROLE.USER), // Reviewing is a User action
   ReviewController.createReview
   /* #swagger.parameters['body'] = {
         in: 'body',
