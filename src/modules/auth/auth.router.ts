@@ -4,15 +4,13 @@ import validateRequest from "../../middleware/validateRequest";
 import { authValidationSchema } from "./auth.validation";
 import auth from "../../middleware/auth";
 import { USER_ROLE } from "../user/user.constant";
-import { loginLimiter } from "../../middleware/security";
+
 
 const router = Router();
-
 router.post(
   "/login",
-  loginLimiter,
   validateRequest(authValidationSchema.authValidation),
-  authController.login
+  authController.login,
   /* #swagger.parameters['body'] = {
         in: 'body',
         description: 'Login credentials',
@@ -21,6 +19,7 @@ router.post(
      }
   */
 );
+
 
 router.post("/refresh-token", authController.refreshToken);
 router.post("/forgot-password", authController.forgotPassword);
