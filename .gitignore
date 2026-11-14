@@ -29,7 +29,6 @@ public/uploads/
 
 # IDE / Editor
 .idea/
-.vscode/
 *.swp
 *.swo
 
