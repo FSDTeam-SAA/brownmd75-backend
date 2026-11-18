@@ -5,9 +5,9 @@
   "scripts": {
     "swagger": "ts-node --transpile-only src/swagger.ts",
     "swagger-watch": "nodemon -x \"npm run swagger\" -e ts --ignore src/swagger.ts",
-    "dev": "node init && concurrently \"npm run swagger-watch\" \"ts-node-dev --respawn --transpile-only src/server.ts\"",
-    "start": "node init && node ./dist/server.js",
-    "build": "node init && tsc",
+    "dev": "concurrently \"npm run swagger-watch\" \"ts-node-dev --respawn --transpile-only src/server.ts\"",
+    "start": "node ./dist/server.js",
+    "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
